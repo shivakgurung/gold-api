@@ -69,6 +69,8 @@ const fetchNepaliRate = (res) => {
         ],
       };
 
+
+
       // Extract gold rates
       $("#header-rate .rate-gold").each((i, el) => {
         const rateDetails = extractRateDetails($(el));
