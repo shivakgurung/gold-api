@@ -9,7 +9,24 @@ app.get("/", (req, res) => {
   res.json("This is a real-time Nepali gold rate generator API.");
 });
 
-app.get("/gold-price", (req, res) => {
+app.get("/api/rates/:country", (req, res) => {
+  const country = req.params.country.toLowerCase();
+
+  switch (country) {
+    case "nepal":
+      fetchNepaliRate(res);
+      break;
+
+    default:
+      res.status(404).json({ error: "Country not supported." });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`The app is running on ${PORT}`);
+});
+
+const fetchNepaliRate = (res) => {
   axios
     .get("https://www.fenegosida.org/rate-history.php")
     .then((response) => {
@@ -56,15 +73,15 @@ app.get("/gold-price", (req, res) => {
       $("#header-rate .rate-gold").each((i, el) => {
         const rateDetails = extractRateDetails($(el));
         const goldType = rates.metals[0].types.find((type) => {
-          console.log("type from returned", rateDetails.type);
-          console.log("type form structure", type.type);
           // rateDetails.type.includes(type.type.split(" ")[0]);
-          type.type == rateDetails.type;
+          // console.log(
+          //   type.type.toLowerCase() == rateDetails.type.toLowerCase()
+          // );
+          return type.type.toLowerCase() == rateDetails.type.toLowerCase();
         });
-        console.log("gold type", goldType);
+        // console.log("gold type", goldType);
         if (goldType) {
           goldType[rateDetails.quantity] = rateDetails.rate;
-          console.log("check");
         }
       });
 
@@ -75,18 +92,13 @@ app.get("/gold-price", (req, res) => {
         silverType[rateDetails.quantity] = rateDetails.rate;
       });
 
-      // console.log(rates);
       res.json(rates);
     })
     .catch((error) => {
       console.error("Error fetching data:", error);
       res.status(500).send("Error fetching data");
     });
-});
-
-app.listen(PORT, () => {
-  console.log(`The app is running on ${PORT}`);
-});
+};
 
 const extractRateDetails = ($element) => {
   const typeText = $element.find("p").html().split("<br>")[0].trim();
@@ -97,6 +109,6 @@ const extractRateDetails = ($element) => {
   const rate = parseFloat(rateText);
   const quantity = quantityText.includes("10 grm") ? "per10gram" : "per1tola";
   const currency = currencyText;
-  // console.log(rate);
+  // console.log(typeText, quantity, rate, currency);
   return { type: typeText, quantity, rate, currency };
 };
