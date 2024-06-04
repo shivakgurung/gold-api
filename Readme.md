@@ -28,3 +28,6 @@ The server will start running on http://localhost:8000.
 
 
 4. Open [http://localhost:8000/api/rates/nepal] with your browser to see the results of the scrape in your terminal.
+
+
+5. To use the API in your project: https://gold-api-3xgt.onrender.com/api/rates/nepal
